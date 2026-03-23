@@ -1,0 +1,25 @@
+Progress Tracker のファイル構成
+
+src/ 以下のファイル構成
+
+progress-tracker/
+├── index.html              ← HTMLの入口（基本触らない）
+├── vite.config.js          ← Viteの設定（基本触らない）
+├── package.json            ← 依存パッケージの定義
+└── src/
+    ├── main.jsx            ← Reactの起動（基本触らない）
+    ├── App.jsx             ← 画面切替・モーダル管理の中枢
+    ├── data/
+    │   └── store.js        ← ★ サンプルデータ・色定数はここ
+    ├── hooks/
+    │   └── useAppData.js   ← CRUD操作まとめ（追加・編集・削除）
+    ├── styles/
+    │   └── global.css      ← ★ CSS変数（色・フォント）はここを変える
+    └── components/
+        ├── Header.jsx / .css
+        ├── Dashboard.jsx / .css
+        ├── ProjectDetail.jsx / .css
+        ├── GanttChart.jsx / .css
+        └── Modal.jsx / .css
+
+

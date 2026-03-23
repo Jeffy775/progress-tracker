@@ -1,0 +1,128 @@
+.project-detail {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 24px;
+  position: relative;
+  z-index: 1;
+}
+
+.detail-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.detail-title {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--text);
+  flex: 1;
+}
+.detail-progress-label {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--accent);
+}
+
+/* フィルター */
+.filter-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.filter-chip {
+  padding: 5px 12px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: transparent;
+  color: var(--text2);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.2s;
+  letter-spacing: 0.03em;
+}
+.filter-chip:hover { border-color: var(--border2); color: var(--text); }
+.filter-chip.active {
+  background: var(--accent-glow);
+  color: var(--accent);
+  border-color: rgba(0, 212, 255, 0.4);
+}
+
+/* タスクテーブル */
+.task-table-wrap { overflow-x: auto; }
+
+.task-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 4px;
+}
+.task-table th {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text3);
+  text-align: left;
+  padding: 8px 16px;
+}
+.task-row {
+  background: var(--surface);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.task-row:hover { background: var(--surface2); }
+.task-row td {
+  padding: 12px 16px;
+  font-size: 13px;
+}
+.task-row td:first-child { border-radius: 6px 0 0 6px; }
+.task-row td:last-child  { border-radius: 0 6px 6px 0; }
+
+.task-name-cell { font-weight: 500; color: var(--text); }
+
+.cell-mono {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text2);
+}
+.text-red { color: var(--red) !important; }
+
+.mini-progress {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.mini-bar {
+  width: 72px;
+  height: 3px;
+  background: var(--surface3);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.mini-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent2), var(--accent));
+  border-radius: 2px;
+}
+.mini-pct {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text2);
+  min-width: 32px;
+}
+
+.btn-edit-row {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text3);
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.btn-edit-row:hover { border-color: var(--accent); color: var(--accent); }
