@@ -1,7 +1,7 @@
 import React from 'react'
 import './Header.css'
 
-export default function Header({ currentView, onViewChange, onAddClick }) {
+export default function Header({ currentView, onViewChange, onAddClick, userEmail, onSignOut }) {
   return (
     <header className="header">
       <div className="logo">
@@ -24,9 +24,19 @@ export default function Header({ currentView, onViewChange, onAddClick }) {
         </button>
       </nav>
 
-      <button className="btn-primary" onClick={onAddClick}>
-        ＋ 新規追加
-      </button>
+      <div className="header-right">
+        {userEmail && (
+          <span className="header-user">{userEmail}</span>
+        )}
+        <button className="btn-primary" onClick={onAddClick}>
+          ＋ 新規追加
+        </button>
+        {onSignOut && (
+          <button className="btn-signout" onClick={onSignOut} title="ログアウト">
+            ログアウト
+          </button>
+        )}
+      </div>
     </header>
   )
 }
