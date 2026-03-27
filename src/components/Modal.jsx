@@ -5,11 +5,11 @@ import './Modal.css'
 // ─────────────────────────────────────────────
 // タスクモーダル
 // ─────────────────────────────────────────────
-export function TaskModal({ task, projects, onSave, onDelete, onClose }) {
+export function TaskModal({ task, defaultProjectId, projects, onSave, onDelete, onClose }) {
   const isEdit = !!task
 
   const [form, setForm] = useState({
-    projectId: projects[0]?.id ?? '',
+    projectId: defaultProjectId ?? projects[0]?.id ?? '',
     name:      '',
     assignee:  '',
     category:  'verify',

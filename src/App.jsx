@@ -166,6 +166,7 @@ export default function App() {
           {modal?.type === 'task' && (
             <TaskModal
               task={modal.task}
+              defaultProjectId={modal.defaultProjectId}
               projects={projects}
               onSave={handleTaskSave}
               onDelete={handleTaskDelete}
