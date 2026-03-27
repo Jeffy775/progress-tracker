@@ -91,6 +91,26 @@ input[type='range']::-webkit-slider-thumb:hover { transform: scale(1.2); }
   text-align: right;
 }
 
+/* カレンダーアイコン ホバーアニメーション */
+@keyframes calendarPop {
+  0%   { transform: scale(1)    rotate(0deg); }
+  50%  { transform: scale(1.25) rotate(-12deg); }
+  75%  { transform: scale(1.18) rotate(4deg); }
+  100% { transform: scale(1.2)  rotate(0deg); }
+}
+
+input[type='date']::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0.45;
+  transition: opacity 0.2s;
+  border-radius: 3px;
+}
+input[type='date']:not(:disabled):hover::-webkit-calendar-picker-indicator {
+  animation: calendarPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  opacity: 1;
+  filter: invert(70%) sepia(80%) saturate(500%) hue-rotate(160deg) brightness(1.1);
+}
+
 /* 日付「未定」チェックボックス・重要チェックボックス */
 .form-label-row {
   display: flex;

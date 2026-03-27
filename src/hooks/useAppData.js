@@ -6,7 +6,7 @@ const toDbProject = (p, userId) => ({
   id:         p.id,
   name:       p.name,
   start_date: p.start,
-  end_date:   p.end,
+  end_date:   p.end ?? null,
   status:     p.status,
   user_id:    userId,
 })
@@ -30,7 +30,7 @@ const fromDbProject = (row) => ({
   id:     row.id,
   name:   row.name,
   start:  row.start_date,
-  end:    row.end_date,
+  end:    row.end_date ?? null,
   status: row.status,
 })
 
