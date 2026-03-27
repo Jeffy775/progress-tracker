@@ -54,14 +54,13 @@ export default function ProjectDetail({ project, tasks, onBack, onTaskClick, onA
               <th>期限</th>
               <th>重要</th>
               <th>ステータス</th>
-              <th>進捗</th>
               <th></th>
             </tr>
           </thead>
           <tbody>
             {filtered.length === 0 ? (
               <tr>
-                <td colSpan={8}>
+                <td colSpan={7}>
                   <div className="empty-state"><div className="icon">✅</div>タスクがありません</div>
                 </td>
               </tr>
@@ -95,14 +94,6 @@ function TaskRow({ task, onClick }) {
       </td>
       <td>{task.important && <span className="important-badge">重要</span>}</td>
       <td><span className={`status-dot ${statusCls}`}>{statusLabel}</span></td>
-      <td>
-        <div className="mini-progress">
-          <div className="mini-bar">
-            <div className="mini-bar-fill" style={{ width: `${task.progress}%` }} />
-          </div>
-          <div className="mini-pct">{task.progress}%</div>
-        </div>
-      </td>
       <td onClick={(e) => e.stopPropagation()}>
         <button className="btn-edit-row" onClick={onClick}>編集</button>
       </td>
