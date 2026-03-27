@@ -68,7 +68,7 @@ export default function Login({ onSignIn, onSignUp }) {
           </button>
           <button
             className={`login-tab ${mode === 'signup' ? 'active' : ''}`}
-            onClick={() => { setMode('signup'); setError(null) }}
+            onClick={() => { setMode('signup'); setError(null); setEmail(''); setPassword('') }}
           >
             新規登録
           </button>

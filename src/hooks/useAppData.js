@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '../lib/supabase.js'
-import { defaultData } from '../data/store.js'
 
 // ── ローカル形式 ↔ DBカラム名の変換 ──────────────
 const toDbProject = (p, userId) => ({
@@ -96,12 +95,6 @@ export function useAppData() {
       setLoading(true)
       setLoadError(null)
       try {
-        // INSERT 時の user_id は React state のクロージャではなく、
-        // その時点のセッションから直接取得することで RLS 違反を防ぐ
-        const { data: { session } } = await supabase.auth.getSession()
-        const uid = session?.user?.id
-        if (!uid) throw new Error('セッションが無効です。再ログインしてください。')
-
         const [{ data: pRows, error: pErr }, { data: tRows, error: tErr }] = await Promise.all([
           supabase.from('projects').select('*').order('created_at'),
           supabase.from('tasks').select('*').order('created_at'),
@@ -110,25 +103,8 @@ export function useAppData() {
         if (pErr) throw new Error(pErr.message)
         if (tErr) throw new Error(tErr.message)
 
-        // DBが空ならサンプルデータを投入
-        if (!pRows?.length) {
-          const { projects: ps, tasks: ts } = defaultData
-          const { error: insP } = await supabase.from('projects').insert(ps.map((p) => toDbProject(p, uid)))
-          if (insP) throw new Error(insP.message)
-          const { error: insT } = await supabase.from('tasks').insert(ts.map((t) => toDbTask(t, uid)))
-          if (insT) throw new Error(insT.message)
-          const [{ data: p2, error: p2Err }, { data: t2, error: t2Err }] = await Promise.all([
-            supabase.from('projects').select('*').order('created_at'),
-            supabase.from('tasks').select('*').order('created_at'),
-          ])
-          if (p2Err) throw new Error(p2Err.message)
-          if (t2Err) throw new Error(t2Err.message)
-          setProjects((p2 ?? []).map(fromDbProject))
-          setTasks((t2 ?? []).map(fromDbTask))
-        } else {
-          setProjects((pRows ?? []).map(fromDbProject))
-          setTasks((tRows ?? []).map(fromDbTask))
-        }
+        setProjects((pRows ?? []).map(fromDbProject))
+        setTasks((tRows ?? []).map(fromDbTask))
       } catch (e) {
         setLoadError(e.message || 'データ読み込みエラー')
       }
