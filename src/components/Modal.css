@@ -131,20 +131,60 @@ input[type='date']:not(:disabled):hover::-webkit-calendar-picker-indicator {
 }
 .checkbox-tbd input[type='checkbox'] { cursor: pointer; accent-color: var(--accent); }
 
-.checkbox-important {
+/* .form-group label の詳細度 (0,1,1) に勝つため (0,2,0) で記述 */
+.form-group .checkbox-important {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
+  cursor: pointer;
+  padding: 9px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border2);
+  background: var(--surface2);
+  transition: border-color 0.15s;
+  /* form-group label の継承スタイルをリセット */
+  text-transform: none;
+  letter-spacing: 0;
+  font-family: var(--font-body);
   font-size: 13px;
   color: var(--text2);
-  cursor: pointer;
-  padding: 9px 0;
+  margin-bottom: 0;
 }
+.form-group .checkbox-important:hover {
+  border-color: rgba(255, 68, 68, 0.5);
+}
+
+/* カスタム checkbox */
 .checkbox-important input[type='checkbox'] {
+  appearance: none;
+  -webkit-appearance: none;
   width: 15px;
   height: 15px;
+  flex-shrink: 0;
+  border: 1.5px solid var(--border2);
+  border-radius: 3px;
+  background: var(--surface3);
   cursor: pointer;
-  accent-color: #ff4444;
+  position: relative;
+  margin: 0;
+  transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
+}
+.checkbox-important input[type='checkbox']:checked {
+  background: #ff4444;
+  border-color: #ff4444;
+  box-shadow: 0 0 6px rgba(255, 68, 68, 0.4);
+}
+.checkbox-important input[type='checkbox']:checked::after {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 1px;
+  width: 4px;
+  height: 8px;
+  border: 2px solid #fff;
+  border-top: none;
+  border-left: none;
+  transform: rotate(45deg);
 }
 
 /* フッター */
