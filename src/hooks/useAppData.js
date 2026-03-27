@@ -1,6 +1,5 @@
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '../lib/supabase.js'
-import { defaultData } from '../data/store.js'
 
 // ── ローカル形式 ↔ DBカラム名の変換 ──────────────
 const toDbProject = (p, userId) => ({
@@ -57,27 +56,20 @@ export function useAppData() {
   const [user,        setUser]        = useState(null)
   const [authLoading, setAuthLoading] = useState(true)
 
-  // useRef でユーザーIDを同期的に保持する。
-  // load() 内で getSession() を非同期呼び出しすると、
-  // 新規ユーザーの SIGNED_IN 直後にセッションが取得できない場合があるため、
-  // onAuthStateChange コールバック内で同期的にセットしたIDを使う。
-  const userIdRef = useRef(null)
-
   // ── 認証状態の監視 ──────────────────────────────
   useEffect(() => {
     // getSession() でストレージから直接セッションを取得。
     // アクセストークンが期限切れでもリフレッシュしてから返すため確実。
     // authLoading は getSession() の完了後にのみ false にする。
     supabase.auth.getSession().then(({ data: { session } }) => {
-      userIdRef.current = session?.user?.id ?? null
       setUser(session?.user ?? null)
       setAuthLoading(false)
     })
 
     // onAuthStateChange はログイン・ログアウト・トークン更新などの変化を監視。
-    // userIdRef を同期的に更新することで load() がRefから確実にIDを読める。
+    // [currentUserId, authLoading] の依存最適化により、
+    // TOKEN_REFRESHED では load() が再実行されないため二重ロードは発生しない。
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      userIdRef.current = session?.user?.id ?? null
       setUser(session?.user ?? null)
     })
 
@@ -103,10 +95,6 @@ export function useAppData() {
       setLoading(true)
       setLoadError(null)
       try {
-        // userIdRef から同期的に取得。onAuthStateChange で必ず先にセットされる。
-        const uid = userIdRef.current
-        if (!uid) throw new Error('セッションが無効です。再ログインしてください。')
-
         const [{ data: pRows, error: pErr }, { data: tRows, error: tErr }] = await Promise.all([
           supabase.from('projects').select('*').order('created_at'),
           supabase.from('tasks').select('*').order('created_at'),
@@ -115,25 +103,8 @@ export function useAppData() {
         if (pErr) throw new Error(pErr.message)
         if (tErr) throw new Error(tErr.message)
 
-        // DBが空ならサンプルデータを投入
-        if (!pRows?.length) {
-          const { projects: ps, tasks: ts } = defaultData
-          const { error: insP } = await supabase.from('projects').insert(ps.map((p) => toDbProject(p, uid)))
-          if (insP) throw new Error(insP.message)
-          const { error: insT } = await supabase.from('tasks').insert(ts.map((t) => toDbTask(t, uid)))
-          if (insT) throw new Error(insT.message)
-          const [{ data: p2, error: p2Err }, { data: t2, error: t2Err }] = await Promise.all([
-            supabase.from('projects').select('*').order('created_at'),
-            supabase.from('tasks').select('*').order('created_at'),
-          ])
-          if (p2Err) throw new Error(p2Err.message)
-          if (t2Err) throw new Error(t2Err.message)
-          setProjects((p2 ?? []).map(fromDbProject))
-          setTasks((t2 ?? []).map(fromDbTask))
-        } else {
-          setProjects((pRows ?? []).map(fromDbProject))
-          setTasks((tRows ?? []).map(fromDbTask))
-        }
+        setProjects((pRows ?? []).map(fromDbProject))
+        setTasks((tRows ?? []).map(fromDbTask))
       } catch (e) {
         setLoadError(e.message || 'データ読み込みエラー')
       }
