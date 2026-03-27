@@ -96,6 +96,12 @@ export function useAppData() {
       setLoading(true)
       setLoadError(null)
       try {
+        // INSERT 時の user_id は React state のクロージャではなく、
+        // その時点のセッションから直接取得することで RLS 違反を防ぐ
+        const { data: { session } } = await supabase.auth.getSession()
+        const uid = session?.user?.id
+        if (!uid) throw new Error('セッションが無効です。再ログインしてください。')
+
         const [{ data: pRows, error: pErr }, { data: tRows, error: tErr }] = await Promise.all([
           supabase.from('projects').select('*').order('created_at'),
           supabase.from('tasks').select('*').order('created_at'),
@@ -107,9 +113,9 @@ export function useAppData() {
         // DBが空ならサンプルデータを投入
         if (!pRows?.length) {
           const { projects: ps, tasks: ts } = defaultData
-          const { error: insP } = await supabase.from('projects').insert(ps.map((p) => toDbProject(p, currentUserId)))
+          const { error: insP } = await supabase.from('projects').insert(ps.map((p) => toDbProject(p, uid)))
           if (insP) throw new Error(insP.message)
-          const { error: insT } = await supabase.from('tasks').insert(ts.map((t) => toDbTask(t, currentUserId)))
+          const { error: insT } = await supabase.from('tasks').insert(ts.map((t) => toDbTask(t, uid)))
           if (insT) throw new Error(insT.message)
           const [{ data: p2, error: p2Err }, { data: t2, error: t2Err }] = await Promise.all([
             supabase.from('projects').select('*').order('created_at'),
