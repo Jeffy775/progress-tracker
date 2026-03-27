@@ -178,8 +178,16 @@ export function ProjectModal({ project, onSave, onDelete, onClose }) {
           <input type="date" value={form.start} onChange={(e) => set('start', e.target.value)} />
         </div>
         <div className="form-group">
-          <label>終了日（目標）</label>
-          <input type="date" value={form.end} onChange={(e) => set('end', e.target.value)} />
+          <div className="form-label-row">
+            <span>終了日（目標）</span>
+            <label className="checkbox-tbd">
+              <input type="checkbox" checked={form.end === null}
+                onChange={(e) => set('end', e.target.checked ? null : today())} />
+              無期限
+            </label>
+          </div>
+          <input type="date" value={form.end ?? ''} disabled={form.end === null}
+            onChange={(e) => set('end', e.target.value)} />
         </div>
       </div>
 

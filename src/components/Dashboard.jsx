@@ -11,7 +11,7 @@ export default function Dashboard({ projects, tasks, onProjectClick, onTaskClick
 
   // ── 直近期限タスク（未完了・期限昇順・8件） ──
   const upcomingTasks = [...tasks]
-    .filter((t) => t.status !== 'done')
+    .filter((t) => t.status !== 'done' && t.end)
     .sort((a, b) => a.end.localeCompare(b.end))
     .slice(0, 8)
 
@@ -91,7 +91,7 @@ function ProjectCard({ project, tasks, onClick, onEdit }) {
           <button className="btn-project-edit" onClick={onEdit}>編集</button>
         </div>
       </div>
-      <div className="project-meta">{project.start} → {project.end}</div>
+      <div className="project-meta">{project.start} → {project.end ?? <span className="meta-unlimited">無期限</span>}</div>
       <div className="progress-bar-wrap">
         <div className="progress-bar-label">
           <span>全体進捗</span><span>{progress}%</span>
