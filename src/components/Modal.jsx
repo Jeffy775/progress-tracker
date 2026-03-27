@@ -16,7 +16,7 @@ export function TaskModal({ task, projects, onSave, onDelete, onClose }) {
     start:     today(),
     end:       today(),
     status:    'todo',
-    priority:  'mid',
+    important: false,
     progress:  0,
     memo:      '',
     ...(task ?? {}),
@@ -71,12 +71,28 @@ export function TaskModal({ task, projects, onSave, onDelete, onClose }) {
 
       <div className="form-row">
         <div className="form-group">
-          <label>開始日</label>
-          <input type="date" value={form.start} onChange={(e) => set('start', e.target.value)} />
+          <div className="form-label-row">
+            <span>開始日</span>
+            <label className="checkbox-tbd">
+              <input type="checkbox" checked={form.start === null}
+                onChange={(e) => set('start', e.target.checked ? null : today())} />
+              未定
+            </label>
+          </div>
+          <input type="date" value={form.start ?? ''} disabled={form.start === null}
+            onChange={(e) => set('start', e.target.value)} />
         </div>
         <div className="form-group">
-          <label>期限</label>
-          <input type="date" value={form.end} onChange={(e) => set('end', e.target.value)} />
+          <div className="form-label-row">
+            <span>期限</span>
+            <label className="checkbox-tbd">
+              <input type="checkbox" checked={form.end === null}
+                onChange={(e) => set('end', e.target.checked ? null : today())} />
+              未定
+            </label>
+          </div>
+          <input type="date" value={form.end ?? ''} disabled={form.end === null}
+            onChange={(e) => set('end', e.target.value)} />
         </div>
       </div>
 
@@ -91,15 +107,16 @@ export function TaskModal({ task, projects, onSave, onDelete, onClose }) {
           </select>
         </div>
         <div className="form-group">
-          <label>優先度</label>
-          <select value={form.priority} onChange={(e) => set('priority', e.target.value)}>
-            <option value="high">高</option>
-            <option value="mid">中</option>
-            <option value="low">低</option>
-          </select>
+          <label>重要</label>
+          <label className="checkbox-important">
+            <input type="checkbox" checked={form.important}
+              onChange={(e) => set('important', e.target.checked)} />
+            重要タスクとしてマーク
+          </label>
         </div>
       </div>
 
+      {/* 進捗率スライダー（将来再導入予定）
       <div className="form-group">
         <label>進捗率</label>
         <div className="progress-input-wrap">
@@ -108,6 +125,7 @@ export function TaskModal({ task, projects, onSave, onDelete, onClose }) {
           <div className="progress-display">{form.progress}%</div>
         </div>
       </div>
+      */}
 
       <div className="form-group">
         <label>メモ</label>

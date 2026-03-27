@@ -89,6 +89,19 @@
   color: var(--text2);
 }
 .text-red { color: var(--red) !important; }
+.text-tbd { color: var(--text3); font-style: italic; }
+
+.important-badge {
+  display: inline-block;
+  padding: 2px 7px;
+  background: rgba(255, 68, 68, 0.15);
+  color: #ff4444;
+  border: 1px solid rgba(255, 68, 68, 0.4);
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.05em;
+}
 
 .mini-progress {
   display: flex;

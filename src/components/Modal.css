@@ -91,6 +91,42 @@ input[type='range']::-webkit-slider-thumb:hover { transform: scale(1.2); }
   text-align: right;
 }
 
+/* 日付「未定」チェックボックス・重要チェックボックス */
+.form-label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.checkbox-tbd {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  color: var(--text3);
+  cursor: pointer;
+  font-family: var(--font-mono);
+  letter-spacing: 0.03em;
+}
+.checkbox-tbd input[type='checkbox'] { cursor: pointer; accent-color: var(--accent); }
+
+.checkbox-important {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text2);
+  cursor: pointer;
+  padding: 9px 0;
+}
+.checkbox-important input[type='checkbox'] {
+  width: 15px;
+  height: 15px;
+  cursor: pointer;
+  accent-color: #ff4444;
+}
+
 /* フッター */
 .modal-footer {
   display: flex;
