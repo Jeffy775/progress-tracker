@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { calcProgress, CATEGORY_MAP, PRIORITY_MAP, STATUS_MAP, isOverdue } from '../data/store.js'
+import { calcProgress, CATEGORY_MAP, STATUS_MAP, isOverdue } from '../data/store.js'
 import './ProjectDetail.css'
 
 const FILTERS = [
@@ -52,7 +52,7 @@ export default function ProjectDetail({ project, tasks, onBack, onTaskClick, onA
               <th>カテゴリ</th>
               <th>担当者</th>
               <th>期限</th>
-              <th>優先度</th>
+              <th>重要</th>
               <th>ステータス</th>
               <th>進捗</th>
               <th></th>
@@ -83,7 +83,6 @@ export default function ProjectDetail({ project, tasks, onBack, onTaskClick, onA
 
 function TaskRow({ task, onClick }) {
   const { label: catLabel, cls: catCls } = CATEGORY_MAP[task.category] || CATEGORY_MAP.other
-  const { label: prioLabel, cls: prioCls } = PRIORITY_MAP[task.priority] || PRIORITY_MAP.mid
   const { label: statusLabel, cls: statusCls } = STATUS_MAP[task.status] || STATUS_MAP.todo
 
   return (
@@ -91,8 +90,10 @@ function TaskRow({ task, onClick }) {
       <td className="task-name-cell">{task.name}</td>
       <td><span className={`category-tag ${catCls}`}>{catLabel}</span></td>
       <td className="cell-mono">{task.assignee}</td>
-      <td className={`cell-mono ${isOverdue(task) ? 'text-red' : ''}`}>{task.end}</td>
-      <td><span className={`priority-badge ${prioCls}`}>{prioLabel}</span></td>
+      <td className={`cell-mono ${isOverdue(task) ? 'text-red' : ''}`}>
+        {task.end ?? <span className="text-tbd">未定</span>}
+      </td>
+      <td>{task.important && <span className="important-badge">重要</span>}</td>
       <td><span className={`status-dot ${statusCls}`}>{statusLabel}</span></td>
       <td>
         <div className="mini-progress">

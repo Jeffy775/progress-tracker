@@ -11,7 +11,11 @@ export default function GanttChart({ projects, tasks, onTaskClick }) {
   const { weeks, minDate } = useMemo(() => {
     if (!tasks.length) return { weeks: [], minDate: null }
 
-    const allDates = tasks.flatMap((t) => [new Date(t.start), new Date(t.end)])
+    // 期限未定タスクは日付計算から除外
+    const datedTasks = tasks.filter((t) => t.start && t.end)
+    if (!datedTasks.length) return { weeks: [], minDate: null }
+
+    const allDates = datedTasks.flatMap((t) => [new Date(t.start), new Date(t.end)])
     let min = new Date(Math.min(...allDates))
     let max = new Date(Math.max(...allDates))
 
@@ -65,8 +69,37 @@ export default function GanttChart({ projects, tasks, onTaskClick }) {
 
           {/* タスク行 */}
           {tasks.map((t) => {
-            const proj        = projects.find((p) => p.id === t.projectId)
-            const catInfo     = CATEGORY_MAP[t.category] || CATEGORY_MAP.other
+            const proj    = projects.find((p) => p.id === t.projectId)
+            const catInfo = CATEGORY_MAP[t.category] || CATEGORY_MAP.other
+
+            // タスク名列（共通）
+            const labelCol = (
+              <div
+                className="gantt-task-label"
+                style={{ width: LABEL_WIDTH, minWidth: LABEL_WIDTH, maxWidth: LABEL_WIDTH }}
+              >
+                <div className="gantt-task-name" title={t.name}>{t.name}</div>
+                <div className="gantt-task-sub" title={`${proj?.name ?? ''} | ${t.assignee}`}>
+                  {proj?.name ?? ''} | {t.assignee}
+                </div>
+              </div>
+            )
+
+            // 期限未定タスク：バーなし・「期限未設定」ラベル表示
+            if (!t.start || !t.end) {
+              return (
+                <div key={t.id} className="gantt-row" onClick={() => onTaskClick(t.id)}>
+                  {labelCol}
+                  <div className="gantt-bars">
+                    {weeks.map((w, i) => (
+                      <div key={i} className={`gantt-week-cell ${isCurrentWeek(w) ? 'current' : ''}`} />
+                    ))}
+                    <span className="gantt-tbd-label">期限未設定</span>
+                  </div>
+                </div>
+              )
+            }
+
             const taskStart   = new Date(t.start)
             const taskEnd     = new Date(t.end)
             const startOffset = Math.round((taskStart - minDate) / (7 * 86400000))
@@ -74,27 +107,20 @@ export default function GanttChart({ projects, tasks, onTaskClick }) {
             const barLeft     = startOffset * WEEK_WIDTH + 4
             const barWidth    = Math.max(24, duration * WEEK_WIDTH - 8)
 
-            // バー色：カテゴリ色を使う（完了のみグリーン固定）
+            // バー色：完了=緑、保留=黄、重要=赤、それ以外=カテゴリ色
             const barBg = t.status === 'done'
               ? '#00e676'
               : t.status === 'hold'
               ? '#ffd740'
+              : t.important
+              ? '#ff4444'
               : catInfo.barColor
 
-            const barTextColor = ['#ffd740'].includes(barBg) ? '#0a0c10' : '#0a0c10'
+            const barTextColor = barBg === '#ffd740' ? '#0a0c10' : '#0a0c10'
 
             return (
               <div key={t.id} className="gantt-row" onClick={() => onTaskClick(t.id)}>
-                {/* タスク名列：幅固定、長文はtooltip */}
-                <div
-                  className="gantt-task-label"
-                  style={{ width: LABEL_WIDTH, minWidth: LABEL_WIDTH, maxWidth: LABEL_WIDTH }}
-                >
-                  <div className="gantt-task-name" title={t.name}>{t.name}</div>
-                  <div className="gantt-task-sub" title={`${proj?.name ?? ''} | ${t.assignee}`}>
-                    {proj?.name ?? ''} | {t.assignee}
-                  </div>
-                </div>
+                {labelCol}
 
                 {/* バー列 */}
                 <div className="gantt-bars">
@@ -122,7 +148,7 @@ export default function GanttChart({ projects, tasks, onTaskClick }) {
         </div>
       </div>
 
-      {/* カテゴリ凡例 */}
+      {/* 凡例 */}
       <div className="gantt-legend">
         {Object.entries(CATEGORY_MAP).map(([key, { label, barColor }]) => (
           <div key={key} className="legend-item">
@@ -137,6 +163,10 @@ export default function GanttChart({ projects, tasks, onTaskClick }) {
         <div className="legend-item">
           <span className="legend-dot" style={{ background: '#8890a0', opacity: 0.5 }} />
           未着手
+        </div>
+        <div className="legend-item">
+          <span className="legend-dot" style={{ background: '#ff4444' }} />
+          重要
         </div>
       </div>
     </div>
