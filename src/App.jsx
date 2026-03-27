@@ -5,10 +5,13 @@ import Dashboard     from './components/Dashboard.jsx'
 import ProjectDetail from './components/ProjectDetail.jsx'
 import GanttChart    from './components/GanttChart.jsx'
 import { TaskModal, ProjectModal } from './components/Modal.jsx'
+import Login         from './components/Login.jsx'
 
 export default function App() {
   const {
     projects, tasks, loading,
+    user, authLoading,
+    signIn, signUp, signOut,
     addProject, editProject, deleteProject,
     addTask,    editTask,    deleteTask,
   } = useAppData()
@@ -63,12 +66,32 @@ export default function App() {
   const currentProject = projects.find((p) => p.id === currentProjectId)
   const currentTasks   = tasks.filter((t)   => t.projectId === currentProjectId)
 
+  // 認証確認中
+  if (authLoading) {
+    return (
+      <div style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        height: '100vh', color: 'var(--text2)',
+        fontFamily: 'var(--font-mono)', fontSize: '13px', letterSpacing: '0.05em',
+      }}>
+        LOADING...
+      </div>
+    )
+  }
+
+  // 未ログイン
+  if (!user) {
+    return <Login onSignIn={signIn} onSignUp={signUp} />
+  }
+
   return (
     <>
       <Header
         currentView={view}
         onViewChange={(v) => setView(v)}
         onAddClick={handleAddClick}
+        userEmail={user.email}
+        onSignOut={signOut}
       />
 
       {loading ? (
