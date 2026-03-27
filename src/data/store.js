@@ -168,8 +168,8 @@ export const daysLeft = (endDate) =>
 export const isOverdue = (task) =>
   task.status !== 'done' && task.end < today()
 
-// プロジェクトの平均進捗率を計算
+// 完了タスク数 ÷ 全タスク数 × 100 で進捗率を計算
 export const calcProgress = (tasks) =>
   tasks.length
-    ? Math.round(tasks.reduce((s, t) => s + t.progress, 0) / tasks.length)
+    ? Math.round(tasks.filter((t) => t.status === 'done').length / tasks.length * 100)
     : 0

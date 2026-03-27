@@ -223,9 +223,7 @@ export default function GanttChart({ projects, tasks, onTaskClick }) {
               border:     t.status === 'todo' ? '1px solid #363b47' : 'none',
             }}
             title={`${t.name}\n${t.start} → ${t.end}\n進捗: ${t.progress}%`}
-          >
-            {t.progress}%
-          </div>
+          />
         </div>
       </div>
     )

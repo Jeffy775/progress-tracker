@@ -43,7 +43,7 @@ const fromDbTask = (row) => ({
   start:     row.start_date ?? null,
   end:       row.end_date   ?? null,
   status:    row.status    ?? 'todo',
-  important: row.important ?? false,
+  important: Boolean(row.important),
   progress:  row.progress  ?? 0,
   memo:      row.memo      ?? '',
 })
