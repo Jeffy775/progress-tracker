@@ -202,9 +202,9 @@ export default function GanttChart({ projects, tasks, onTaskClick }) {
     const barLeft     = startOffset * WEEK_WIDTH + 4
     const barWidth    = Math.max(24, duration * WEEK_WIDTH - 8)
 
-    const barBg = t.status === 'done'  ? '#00e676'
+    const barBg = (t.important && t.status !== 'done') ? '#ff4444'
+                : t.status === 'done'  ? '#00e676'
                 : t.status === 'hold'  ? '#ffd740'
-                : t.important          ? '#ff4444'
                 : catInfo.barColor
 
     return (
