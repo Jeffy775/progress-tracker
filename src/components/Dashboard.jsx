@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { today, daysLeft, isOverdue, calcProgress, STATUS_MAP, PROJECT_STATUS_MAP } from '../data/store.js'
 import './Dashboard.css'
 
@@ -6,6 +6,29 @@ export default function Dashboard({ projects, tasks, onProjectClick, onTaskClick
   const [dlFilter,   setDlFilter]   = useState('all')
   const [dlAssignee, setDlAssignee] = useState('all')
   const [dlSearch,   setDlSearch]   = useState('')
+  const [popup,      setPopup]      = useState(null)
+
+  // ── 初回ポップアップ通知（ページロード時1回のみ） ──
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (!tasks.length) return
+    const t0 = new Date().toISOString().slice(0, 10)
+    const overdue = tasks.filter((t) => t.status !== 'done' && t.end && t.end < t0)
+    const soon    = tasks.filter((t) => {
+      if (t.status === 'done' || !t.end || t.end < t0) return false
+      return Math.ceil((new Date(t.end) - new Date(t0)) / 86400000) <= 7
+    })
+    if (overdue.length > 0)     setPopup({ type: 'overdue', count: overdue.length })
+    else if (soon.length > 0)   setPopup({ type: 'soon',    count: soon.length })
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // 5秒後に自動クローズ
+  useEffect(() => {
+    if (!popup) return
+    const t = setTimeout(() => setPopup(null), 5000)
+    return () => clearTimeout(t)
+  }, [popup])
 
   // ── サマリー集計 ──────────────────────────
   const doneCount    = tasks.filter((t) => t.status === 'done').length
@@ -125,6 +148,17 @@ export default function Dashboard({ projects, tasks, onProjectClick, onTaskClick
           ))
         )}
       </div>
+      {/* ポップアップ通知 */}
+      {popup && (
+        <div className={`dash-popup ${popup.type}`}>
+          <span className="dash-popup-msg">
+            {popup.type === 'overdue'
+              ? `🚨 期限超過のタスクが ${popup.count} 件あります。早急に対応してください。`
+              : `⚠️ 期限が近いタスクが ${popup.count} 件あります`}
+          </span>
+          <button className="dash-popup-close" onClick={() => setPopup(null)}>×</button>
+        </div>
+      )}
     </div>
   )
 }

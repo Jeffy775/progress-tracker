@@ -1,7 +1,12 @@
 import React from 'react'
+import NotificationBell from './NotificationBell.jsx'
 import './Header.css'
 
-export default function Header({ currentView, onViewChange, onAddClick, userEmail, onSignOut }) {
+export default function Header({
+  currentView, onViewChange, onAddClick,
+  userEmail, onSignOut,
+  tasks = [], projects = [], onShowNotifications,
+}) {
   return (
     <header className="header">
       <div className="logo">
@@ -25,6 +30,11 @@ export default function Header({ currentView, onViewChange, onAddClick, userEmai
       </nav>
 
       <div className="header-right">
+        <NotificationBell
+          tasks={tasks}
+          projects={projects}
+          onShowAll={onShowNotifications}
+        />
         {userEmail && (
           <span className="header-user">{userEmail}</span>
         )}

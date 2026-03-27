@@ -5,7 +5,8 @@ import Dashboard     from './components/Dashboard.jsx'
 import ProjectDetail from './components/ProjectDetail.jsx'
 import GanttChart    from './components/GanttChart.jsx'
 import { TaskModal, ProjectModal } from './components/Modal.jsx'
-import Login         from './components/Login.jsx'
+import Login             from './components/Login.jsx'
+import NotificationsPage from './components/NotificationsPage.jsx'
 
 export default function App() {
   const {
@@ -92,6 +93,9 @@ export default function App() {
         onAddClick={handleAddClick}
         userEmail={user.email}
         onSignOut={signOut}
+        tasks={tasks}
+        projects={projects}
+        onShowNotifications={() => setView('notifications')}
       />
 
       {loading ? (
@@ -139,6 +143,14 @@ export default function App() {
               projects={projects}
               tasks={tasks}
               onTaskClick={handleTaskClick}
+            />
+          )}
+
+          {view === 'notifications' && (
+            <NotificationsPage
+              tasks={tasks}
+              projects={projects}
+              onBack={() => setView('dashboard')}
             />
           )}
 
