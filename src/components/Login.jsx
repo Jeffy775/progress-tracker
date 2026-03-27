@@ -16,11 +16,11 @@ export default function Login({ onSignIn, onSignUp }) {
 
     if (mode === 'signin') {
       const err = await onSignIn(email, password)
-      if (err) setError(err.message)
+      if (err) setError(err.message || err.error_description || 'ログインに失敗しました')
     } else {
       const err = await onSignUp(email, password)
       if (err) {
-        setError(err.message)
+        setError(err.message || err.error_description || 'アカウント作成に失敗しました')
       } else {
         setDone(true)
       }

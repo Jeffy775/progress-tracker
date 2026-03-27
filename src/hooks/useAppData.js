@@ -53,16 +53,23 @@ export function useAppData() {
   const [projects,    setProjects]    = useState([])
   const [tasks,       setTasks]       = useState([])
   const [loading,     setLoading]     = useState(true)
+  const [loadError,   setLoadError]   = useState(null)
   const [user,        setUser]        = useState(null)
   const [authLoading, setAuthLoading] = useState(true)
 
   // ── 認証状態の監視 ──────────────────────────────
   useEffect(() => {
+    // getSession() でストレージから直接セッションを取得。
+    // アクセストークンが期限切れでもリフレッシュしてから返すため確実。
+    // authLoading は getSession() の完了後にのみ false にする。
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null)
       setAuthLoading(false)
     })
 
+    // onAuthStateChange はログイン・ログアウト・トークン更新などの変化を監視。
+    // [currentUserId, authLoading] の依存最適化により、
+    // TOKEN_REFRESHED では load() が再実行されないため二重ロードは発生しない。
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null)
     })
@@ -71,10 +78,14 @@ export function useAppData() {
   }, [])
 
   // ── データ読み込み（ログイン時のみ）──────────────
+  // user オブジェクトの参照ではなく user.id（文字列）で比較することで
+  // TOKEN_REFRESHED による不要な再ロードを防ぐ
+  const currentUserId = user?.id ?? null
+
   useEffect(() => {
     if (authLoading) return
 
-    if (!user) {
+    if (!currentUserId) {
       setProjects([])
       setTasks([])
       setLoading(false)
@@ -83,30 +94,43 @@ export function useAppData() {
 
     const load = async () => {
       setLoading(true)
-      const [{ data: pRows }, { data: tRows }] = await Promise.all([
-        supabase.from('projects').select('*').order('created_at'),
-        supabase.from('tasks').select('*').order('created_at'),
-      ])
-
-      // DBが空ならサンプルデータを投入
-      if (!pRows?.length) {
-        const { projects: ps, tasks: ts } = defaultData
-        await supabase.from('projects').insert(ps.map((p) => toDbProject(p, user.id)))
-        await supabase.from('tasks').insert(ts.map((t) => toDbTask(t, user.id)))
-        const [{ data: p2 }, { data: t2 }] = await Promise.all([
+      setLoadError(null)
+      try {
+        const [{ data: pRows, error: pErr }, { data: tRows, error: tErr }] = await Promise.all([
           supabase.from('projects').select('*').order('created_at'),
           supabase.from('tasks').select('*').order('created_at'),
         ])
-        setProjects((p2 ?? []).map(fromDbProject))
-        setTasks((t2 ?? []).map(fromDbTask))
-      } else {
-        setProjects((pRows ?? []).map(fromDbProject))
-        setTasks((tRows ?? []).map(fromDbTask))
+
+        if (pErr) throw new Error(pErr.message)
+        if (tErr) throw new Error(tErr.message)
+
+        // DBが空ならサンプルデータを投入
+        if (!pRows?.length) {
+          const { projects: ps, tasks: ts } = defaultData
+          const { error: insP } = await supabase.from('projects').insert(ps.map((p) => toDbProject(p, currentUserId)))
+          if (insP) throw new Error(insP.message)
+          const { error: insT } = await supabase.from('tasks').insert(ts.map((t) => toDbTask(t, currentUserId)))
+          if (insT) throw new Error(insT.message)
+          const [{ data: p2, error: p2Err }, { data: t2, error: t2Err }] = await Promise.all([
+            supabase.from('projects').select('*').order('created_at'),
+            supabase.from('tasks').select('*').order('created_at'),
+          ])
+          if (p2Err) throw new Error(p2Err.message)
+          if (t2Err) throw new Error(t2Err.message)
+          setProjects((p2 ?? []).map(fromDbProject))
+          setTasks((t2 ?? []).map(fromDbTask))
+        } else {
+          setProjects((pRows ?? []).map(fromDbProject))
+          setTasks((tRows ?? []).map(fromDbTask))
+        }
+      } catch (e) {
+        setLoadError(e.message || 'データ読み込みエラー')
       }
       setLoading(false)
     }
     load()
-  }, [user, authLoading])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentUserId, authLoading])
 
   // ── 認証 ──────────────────────────────────────
   const signIn = useCallback(async (email, password) => {
@@ -159,7 +183,7 @@ export function useAppData() {
   }, [])
 
   return {
-    projects, tasks, loading,
+    projects, tasks, loading, loadError,
     user, authLoading,
     signIn, signUp, signOut,
     addProject, editProject, deleteProject,

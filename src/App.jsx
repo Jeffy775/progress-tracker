@@ -9,7 +9,7 @@ import Login         from './components/Login.jsx'
 
 export default function App() {
   const {
-    projects, tasks, loading,
+    projects, tasks, loading, loadError,
     user, authLoading,
     signIn, signUp, signOut,
     addProject, editProject, deleteProject,
@@ -101,6 +101,16 @@ export default function App() {
           fontFamily: 'var(--font-mono)', fontSize: '13px', letterSpacing: '0.05em',
         }}>
           LOADING...
+        </div>
+      ) : loadError ? (
+        <div style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          height: 'calc(100vh - 60px)', color: 'var(--red)',
+          fontFamily: 'var(--font-mono)', fontSize: '13px', letterSpacing: '0.05em',
+          flexDirection: 'column', gap: '8px',
+        }}>
+          <span>データ読み込みエラー</span>
+          <span style={{ fontSize: '11px', color: 'var(--text2)' }}>{loadError}</span>
         </div>
       ) : (
         <>
