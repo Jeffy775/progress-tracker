@@ -34,7 +34,7 @@ export default function Login({ onSignIn, onSignUp }) {
         <div className="login-card">
           <div className="login-logo">
             <div className="login-logo-dot" />
-            PROGRESS TRACKER
+            プロジェクト管理システム
           </div>
           <p className="login-done-msg">
             確認メールを送信しました。<br />
@@ -56,7 +56,7 @@ export default function Login({ onSignIn, onSignUp }) {
       <div className="login-card">
         <div className="login-logo">
           <div className="login-logo-dot" />
-          PROGRESS TRACKER
+          プロジェクト管理システム
         </div>
 
         <div className="login-tabs">

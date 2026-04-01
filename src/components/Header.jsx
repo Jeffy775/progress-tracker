@@ -11,7 +11,7 @@ export default function Header({
     <header className="header">
       <div className="logo">
         <div className="logo-dot" />
-        PROGRESS TRACKER
+        プロジェクト管理システム
       </div>
 
       <nav className="nav-tabs">
